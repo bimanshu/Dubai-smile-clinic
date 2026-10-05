@@ -1,0 +1,126 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+import { dentists, dentistRole } from '../data/site';
+import { img } from '../lib/images';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<section id="dentists" class="section overflow-clip bg-surface-muted" aria-labelledby="dentists-title">
+  <div class="container-page">
+    <div class="flex flex-wrap items-end justify-between gap-8">
+      <div class="max-w-[38rem]" data-reveal>
+        <p class="eyebrow">
+          <Icon name="users-three" size={16} />
+          {t(ui.dentists.eyebrow)}
+        </p>
+        <h2 id="dentists-title" class="mt-6 text-title">{t(ui.dentists.title)}</h2>
+        <p class="mt-5 text-lead text-ink-2">{t(ui.dentists.sub)}</p>
+      </div>
+      <div class="flex gap-2" data-reveal style="--i:1">
+        <button type="button" class="carousel-btn" data-carousel-prev aria-controls="dentist-track" disabled>
+          <Icon name="arrow-right" size={20} class="-scale-x-100 rtl:scale-x-100" />
+          <span class="sr-only">{t(ui.dentists.prev)}</span>
+        </button>
+        <button type="button" class="carousel-btn" data-carousel-next aria-controls="dentist-track">
+          <Icon name="arrow-right" size={20} class="flip-rtl" />
+          <span class="sr-only">{t(ui.dentists.next)}</span>
+        </button>
+      </div>
+    </div>
+
+    <ul id="dentist-track" class="track mt-12" aria-label={t(ui.dentists.listLabel)} data-carousel-track data-reveal style="--i:2">
+      {dentists.map((d) => (
+        <li class="track-item" data-carousel-item>
+          <figure>
+            <div class="bezel">
+              <div class="bezel-core aspect-[4/5]">
+                <Picture
+                  src={img(`doctors/${d.slug}`)}
+                  alt=""
+                  widths={[240, 320, 420]}
+                  sizes="(min-width: 1280px) 18rem, (min-width: 1024px) 22vw, (min-width: 640px) 40vw, 70vw"
+                  formats={['avif', 'webp']}
+                  loading="lazy"
+                  class="dentist-photo no-outline size-full object-cover object-top"
+                />
+              </div>
+            </div>
+            <figcaption class="mt-4 px-1">
+              <span class="block text-subheading">{t(d.name)}</span>
+              <span class="mt-1 block text-body-sm text-ink-2">{t(d.female ? dentistRole.female : dentistRole.male)}</span>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* Full-bleed track: scrolls edge to edge, but cards line up with the page container */
+  .track {
+    --bleed: 1rem;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(72vw, 17rem);
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-inline: calc(50% - 50vw);
+    padding: 0.25rem var(--bleed) 1rem;
+    scroll-padding-inline: var(--bleed);
+  }
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+  @media (min-width: 40rem) {
+    .track {
+      --bleed: 1.5rem;
+      grid-auto-columns: 18rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    .track {
+      --bleed: max(2.5rem, calc((100vw - 82rem) / 2 + 2.5rem));
+      grid-auto-columns: calc((min(100vw, 82rem) - 5rem - 3.75rem) / 4);
+      gap: 1.25rem;
+    }
+  }
+  .track-item {
+    scroll-snap-align: start;
+  }
+  :global(.dentist-photo) {
+    transition: transform 600ms var(--ease-snappy);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .track-item:hover :global(.dentist-photo) {
+      transform: scale(1.03);
+    }
+  }
+  .carousel-btn {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    color: var(--color-ink);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-ring), var(--inset-highlight);
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-snappy),
+      opacity 200ms ease;
+  }
+  .carousel-btn:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+  .carousel-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+</style>

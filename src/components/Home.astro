@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import Stats from './Stats.astro';
+import Treatments from './Treatments.astro';
+import Results from './Results.astro';
+import Founder from './Founder.astro';
+import WhyUs from './WhyUs.astro';
+import Dentists from './Dentists.astro';
+import Reviews from './Reviews.astro';
+import Clinics from './Clinics.astro';
+import Faq from './Faq.astro';
+import Booking from './Booking.astro';
+import Footer from './Footer.astro';
+import MobileBar from './MobileBar.astro';
+import type { Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<Base lang={lang}>
+  <Nav lang={lang} />
+  <main id="main" tabindex="-1">
+    <Hero lang={lang} />
+    <Stats lang={lang} />
+    <Treatments lang={lang} />
+    <Results lang={lang} />
+    <Founder lang={lang} />
+    <WhyUs lang={lang} />
+    <Dentists lang={lang} />
+    <Reviews lang={lang} />
+    <Clinics lang={lang} />
+    <Faq lang={lang} />
+    <Booking lang={lang} />
+  </main>
+  <Footer lang={lang} />
+  <MobileBar lang={lang} />
+  <script>
+    import '../scripts/site.ts';
+  </script>
+</Base>

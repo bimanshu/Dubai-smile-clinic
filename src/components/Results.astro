@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import Compare from './Compare.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<section id="results" class="section bg-surface-muted" aria-labelledby="results-title">
+  <div class="container-page grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+    <div class="lg:col-span-6 xl:col-span-7" data-reveal>
+      <Compare
+        lang={lang}
+        id="results-compare"
+        before="results/smile-b-before"
+        after="results/smile-b-after"
+        altBefore={t(ui.results.alt.bBefore)}
+        altAfter={t(ui.results.alt.bAfter)}
+        sizes="(min-width: 1024px) 34rem, (min-width: 640px) 30rem, 92vw"
+        class="mx-auto w-full max-w-[34rem] lg:me-0"
+      />
+    </div>
+    <div class="lg:col-span-6 xl:col-span-5" data-reveal style="--i:1">
+      <p class="eyebrow">
+        <Icon name="sparkle" size={16} />
+        {t(ui.results.eyebrow)}
+      </p>
+      <h2 id="results-title" class="mt-6 text-title">{t(ui.results.title)}</h2>
+      <p class="mt-5 max-w-[34rem] text-lead text-ink-2">{t(ui.results.sub)}</p>
+      <p class="mt-8 max-w-[34rem] border-s-2 border-line ps-4 text-body-sm text-ink-3">{t(ui.results.note)}</p>
+      <a href="#book" class="btn btn-primary btn-has-icon mt-10" data-book-treatment="hollywood-smile">
+        {t(ui.cta.book)}
+        <span class="btn-icon"><Icon name="arrow-right" size={18} class="flip-rtl" /></span>
+      </a>
+    </div>
+  </div>
+</section>

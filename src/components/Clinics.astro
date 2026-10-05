@@ -1,0 +1,113 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+import { clinics, mapsHref, telHref } from '../data/site';
+import { img } from '../lib/images';
+import { formatTime } from '../lib/format';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const c = ui.clinics;
+const range = ([a, b]: [string, string]) => `${formatTime(a, lang)} ${t(c.to)} ${formatTime(b, lang)}`;
+const statusStrings = {
+  openUntil: t(c.status.openUntil),
+  closingSoon: t(c.status.closingSoon),
+  closedOpens: t(c.status.closedOpens),
+  today: t(c.status.today),
+  tomorrow: t(c.status.tomorrow),
+};
+---
+<section id="clinics" class="section" aria-labelledby="clinics-title" data-status-strings={JSON.stringify(statusStrings)} data-lang={lang}>
+  <div class="container-page">
+    <div class="max-w-[40rem]" data-reveal>
+      <h2 id="clinics-title" class="text-title">{t(c.title)}</h2>
+      <p class="mt-5 text-lead text-ink-2">{t(c.sub)}</p>
+    </div>
+
+    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:mt-16 xl:grid-cols-4">
+      {clinics.map((cl, i) => (
+        <li data-reveal style={`--i:${i}`}>
+          <article class="bezel h-full" aria-labelledby={`clinic-${cl.id}`}>
+            <div class="bezel-core flex h-full flex-col">
+              <Picture
+                src={img(`clinics/${cl.id}`)}
+                alt=""
+                widths={[320, 480, 640]}
+                sizes="(min-width: 1280px) 18rem, (min-width: 640px) 45vw, 92vw"
+                formats={['avif', 'webp']}
+                loading="lazy"
+                class="no-outline aspect-[4/3] w-full object-cover object-[50%_30%]"
+              />
+              <div class="flex flex-1 flex-col p-5 sm:p-6">
+                <h3 id={`clinic-${cl.id}`} class="text-heading">{t(cl.name)}</h3>
+                <p
+                  class="status mt-2 flex items-center gap-2 text-body-sm font-medium"
+                  data-clinic-status
+                  data-hours={JSON.stringify(cl.hours)}
+                  hidden
+                >
+                  <span class="status-dot" aria-hidden="true"></span>
+                  <span data-status-text></span>
+                </p>
+                <p class="mt-4 flex gap-2 text-body-sm text-ink-2">
+                  <Icon name="map-pin" size={18} class="mt-0.5 text-ink-3" />
+                  <span>{t(cl.address)}</span>
+                </p>
+                <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-body-sm">
+                  <dt class="text-ink-2">{t(c.sunThu)}</dt>
+                  <dd class="tabular text-end text-ink"><bdi>{range(cl.hours.weekdays)}</bdi></dd>
+                  <dt class="text-ink-2">{t(c.fri)}</dt>
+                  <dd class="tabular text-end text-ink"><bdi>{range(cl.hours.friday)}</bdi></dd>
+                  <dt class="text-ink-2">{t(c.sat)}</dt>
+                  <dd class="text-end text-ink">{t(c.closed)}</dd>
+                </dl>
+                <div class="mt-auto flex flex-wrap gap-2 pt-6">
+                  <a href={telHref(cl.phone)} class="btn btn-secondary btn-sm">
+                    <Icon name="phone" size={18} />
+                    <span class="sr-only">{t(c.callAria, { name: t(cl.name) })}:</span>
+                    <bdi dir="ltr" class="tabular">{cl.phone}</bdi>
+                  </a>
+                  <a
+                    href={mapsHref(cl.mapsQuery)}
+                    class="btn btn-quiet btn-sm"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label={`${t(c.directionsAria, { name: t(cl.name) })} ${t(ui.cta.newTab)}`}
+                  >
+                    <Icon name="map-trifold" size={18} />
+                    {t(ui.cta.directions)}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .status {
+    color: var(--color-ink-2);
+  }
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background-color: var(--color-line-strong);
+  }
+  .status[data-state='open'] {
+    color: var(--color-success);
+  }
+  .status[data-state='open'] .status-dot {
+    background-color: var(--color-success-fill);
+  }
+  .status[data-state='soon'] {
+    color: var(--color-warning);
+  }
+  .status[data-state='soon'] .status-dot {
+    background-color: var(--color-warning-fill);
+  }
+</style>

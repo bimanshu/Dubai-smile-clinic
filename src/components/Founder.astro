@@ -1,0 +1,50 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import ui, { type Lang, useT } from '../i18n/ui';
+import { img } from '../lib/images';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const signature = await getImage({ src: img('misc/signature'), format: 'png', width: 240 });
+---
+<section class="section" aria-labelledby="founder-quote">
+  <figure class="container-page flex max-w-[60rem] flex-col items-center text-center">
+    <blockquote data-reveal>
+      <p id="founder-quote" class="text-title text-ink">
+        <span aria-hidden="true">{lang === 'ar' ? '«' : '“'}</span>{t(ui.founder.quote)}<span aria-hidden="true">{lang === 'ar' ? '»' : '”'}</span>
+      </p>
+      <p class="mx-auto mt-6 max-w-[44rem] text-lead text-ink-2">{t(ui.founder.body)}</p>
+    </blockquote>
+    <figcaption class="mt-10 flex items-center gap-4 text-start" data-reveal style="--i:1">
+      <span class="block size-16 overflow-hidden rounded-full shadow-[var(--shadow-ring)]">
+        <Picture
+          src={img('misc/founder')}
+          alt=""
+          widths={[128, 192]}
+          sizes="4rem"
+          formats={['avif', 'webp']}
+          loading="lazy"
+          class="no-outline size-full scale-[1.6] object-cover object-[40%_22%]"
+        />
+      </span>
+      <span class="flex flex-col">
+        <span class="text-subheading">{t(ui.founder.name)}</span>
+        <span class="text-body-sm text-ink-2">{t(ui.founder.role)}</span>
+      </span>
+      <span
+        class="signature ms-2 h-10 w-20 bg-ink"
+        role="img"
+        aria-label={t(ui.founder.signature)}
+        style={`--sig: url(${signature.src})`}
+      ></span>
+    </figcaption>
+  </figure>
+</section>
+
+<style>
+  .signature {
+    -webkit-mask: var(--sig) center / contain no-repeat;
+    mask: var(--sig) center / contain no-repeat;
+    opacity: 0.85;
+  }
+</style>

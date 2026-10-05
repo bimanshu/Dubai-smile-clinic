@@ -1,0 +1,599 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Fonts (self-hosted, woff2, swap)
+   Geist covers Latin; IBM Plex Sans Arabic covers Arabic script only,
+   so Latin glyphs on the Arabic page (numbers, "Dr.") stay in Geist.
+------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin-ext.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Plex Arabic';
+  src: url('/fonts/plex-arabic-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Plex Arabic';
+  src: url('/fonts/plex-arabic-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Plex Arabic';
+  src: url('/fonts/plex-arabic-600.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+/* ------------------------------------------------------------------
+   Primitives. Never referenced by components directly; only the
+   semantic tokens below point at them.
+   Accent ramp: hue 234 (the blue in the Dubai Smile logo, #019cd6).
+   Neutral ramp: hue 262, a cool porcelain that ends in the brand navy.
+------------------------------------------------------------------- */
+:root {
+  --blue-1: oklch(0.985 0.008 234);
+  --blue-2: oklch(0.965 0.019 234);
+  --blue-3: oklch(0.935 0.036 234);
+  --blue-4: oklch(0.895 0.058 234);
+  --blue-5: oklch(0.835 0.094 234);
+  --blue-6: oklch(0.76 0.12 234);
+  --blue-7: oklch(0.68 0.137 234);
+  --blue-8: oklch(0.58 0.117 234);
+  --blue-9: oklch(0.51 0.103 234);
+  --blue-10: oklch(0.44 0.089 234);
+  --blue-11: oklch(0.36 0.073 234);
+  --blue-12: oklch(0.27 0.055 234);
+
+  --slate-0: oklch(0.995 0.002 262);
+  --slate-1: oklch(0.982 0.004 262);
+  --slate-2: oklch(0.965 0.006 262);
+  --slate-3: oklch(0.94 0.009 262);
+  --slate-4: oklch(0.912 0.012 262);
+  --slate-5: oklch(0.878 0.015 262);
+  --slate-6: oklch(0.83 0.018 262);
+  --slate-7: oklch(0.75 0.022 262);
+  --slate-8: oklch(0.64 0.027 262);
+  --slate-9: oklch(0.51 0.03 262);
+  --slate-10: oklch(0.455 0.034 263);
+  --slate-11: oklch(0.36 0.04 265);
+  --slate-12: oklch(0.235 0.042 267);
+
+  --night-0: oklch(0.155 0.02 265);
+  --night-1: oklch(0.18 0.022 265);
+  --night-2: oklch(0.215 0.024 265);
+  --night-3: oklch(0.25 0.026 265);
+  --night-4: oklch(0.3 0.026 265);
+  --night-5: oklch(0.37 0.026 265);
+  --night-blue: oklch(0.29 0.05 234);
+}
+
+/* ------------------------------------------------------------------
+   Semantic tokens (light). Dark values are swapped below.
+   Radius rule for the whole site:
+     interactive controls (buttons, chips, tabs) = full pill
+     media + cards = double bezel: 28px shell, 6px gap, 22px core
+     single-layer tiles (bento, reviews, link cards) = 28px shell radius
+     small surfaces (rows, alerts) = 16px, inputs = 14px
+------------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+  --color-canvas: var(--slate-1);
+  --color-surface: var(--slate-0);
+  --color-surface-muted: var(--slate-2);
+  --color-surface-sunken: var(--slate-3);
+  --color-surface-accent: var(--blue-2);
+  --color-line: oklch(0.235 0.042 267 / 0.09);
+  --color-line-strong: var(--slate-8);
+  --color-ink: var(--slate-12);
+  --color-ink-2: var(--slate-10);
+  --color-ink-3: var(--slate-9);
+  --color-ink-on-accent-soft: var(--blue-11);
+  --color-action: var(--slate-12);
+  --color-action-hover: var(--slate-11);
+  --color-on-action: var(--slate-0);
+  --color-accent: var(--blue-7);
+  --color-accent-strong: var(--blue-10);
+  --color-on-accent: var(--slate-12);
+  --color-focus: var(--blue-8);
+  --color-success: oklch(0.48 0.12 152);
+  --color-success-fill: oklch(0.62 0.16 152);
+  --color-warning: oklch(0.5 0.11 70);
+  --color-warning-fill: oklch(0.72 0.15 75);
+  --color-danger: oklch(0.52 0.19 25);
+  --color-logo-red: oklch(0.604 0.221 28);
+  --color-logo-blue: oklch(0.653 0.137 234);
+  --color-glass: oklch(0.995 0.002 262 / 0.72);
+  --color-glass-strong: oklch(0.995 0.002 262 / 0.9);
+  --color-white: oklch(1 0 0);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-arabic: 'Plex Arabic', 'Geist', ui-sans-serif, system-ui, 'Segoe UI', Tahoma, sans-serif;
+
+  /* Type scale, named by use */
+  --text-display: clamp(2.5rem, 1.55rem + 3.4vw, 4.375rem);
+  --text-display--line-height: 1.03;
+  --text-display--letter-spacing: -0.038em;
+  --text-display--font-weight: 600;
+  --text-title: clamp(2rem, 1.45rem + 1.9vw, 3.25rem);
+  --text-title--line-height: 1.06;
+  --text-title--letter-spacing: -0.032em;
+  --text-title--font-weight: 600;
+  --text-heading: clamp(1.375rem, 1.2rem + 0.55vw, 1.75rem);
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading--font-weight: 600;
+  --text-subheading: 1.125rem;
+  --text-subheading--line-height: 1.35;
+  --text-subheading--letter-spacing: -0.01em;
+  --text-subheading--font-weight: 600;
+  --text-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.3;
+  --text-label--letter-spacing: 0.09em;
+  --text-label--font-weight: 500;
+  --text-stat: clamp(2.25rem, 1.8rem + 1.6vw, 3.5rem);
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.04em;
+  --text-stat--font-weight: 600;
+
+  --radius-shell: 1.75rem;
+  --radius-core: 1.375rem;
+  --radius-card: 1rem;
+  --radius-input: 0.875rem;
+
+  --shadow-soft: 0 1px 1px oklch(0.235 0.042 267 / 0.04), 0 10px 28px -12px oklch(0.235 0.042 267 / 0.12),
+    0 30px 60px -30px oklch(0.235 0.042 267 / 0.16);
+  --shadow-float: 0 1px 2px oklch(0.235 0.042 267 / 0.06), 0 14px 40px -14px oklch(0.235 0.042 267 / 0.22);
+  --shadow-ring: 0 0 0 1px oklch(0.235 0.042 267 / 0.08);
+  --inset-highlight: inset 0 1px 0 oklch(1 0 0 / 0.7);
+
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-icon: cubic-bezier(0.2, 0, 0, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: var(--night-1);
+    --color-surface: var(--night-2);
+    --color-surface-muted: var(--night-0);
+    --color-surface-sunken: var(--night-3);
+    --color-surface-accent: var(--night-blue);
+    --color-line: oklch(1 0 0 / 0.09);
+    --color-line-strong: var(--slate-8);
+    --color-ink: oklch(0.965 0.004 262);
+    --color-ink-2: oklch(0.8 0.015 262);
+    --color-ink-3: oklch(0.69 0.02 262);
+    --color-ink-on-accent-soft: var(--blue-4);
+    --color-action: oklch(0.965 0.004 262);
+    --color-action-hover: var(--slate-4);
+    --color-on-action: var(--slate-12);
+    --color-accent: var(--blue-6);
+    --color-accent-strong: var(--blue-5);
+    --color-on-accent: var(--slate-12);
+    --color-focus: var(--blue-6);
+    --color-success: oklch(0.78 0.13 152);
+    --color-success-fill: oklch(0.72 0.16 152);
+    --color-warning: oklch(0.82 0.12 80);
+    --color-warning-fill: oklch(0.78 0.15 75);
+    --color-danger: oklch(0.72 0.15 25);
+    --color-glass: oklch(0.215 0.024 265 / 0.68);
+    --color-glass-strong: oklch(0.215 0.024 265 / 0.9);
+    --shadow-soft: 0 1px 1px oklch(0 0 0 / 0.2), 0 10px 28px -12px oklch(0 0 0 / 0.45),
+      0 30px 60px -30px oklch(0 0 0 / 0.5);
+    --shadow-float: 0 1px 2px oklch(0 0 0 / 0.3), 0 14px 40px -14px oklch(0 0 0 / 0.55);
+    --shadow-ring: 0 0 0 1px oklch(1 0 0 / 0.08);
+    --inset-highlight: inset 0 1px 0 oklch(1 0 0 / 0.06);
+    color-scheme: dark;
+  }
+}
+
+/* Arabic: script-aware font, no tracking (it breaks letter joins), taller lines */
+html:lang(ar) {
+  --font-sans: var(--font-arabic);
+  --text-display--letter-spacing: 0;
+  --text-title--letter-spacing: 0;
+  --text-heading--letter-spacing: 0;
+  --text-subheading--letter-spacing: 0;
+  --text-label--letter-spacing: 0;
+  --text-stat--letter-spacing: -0.02em;
+  --text-display--line-height: 1.25;
+  --text-title--line-height: 1.28;
+  --text-heading--line-height: 1.4;
+  --text-body--line-height: 1.75;
+  --text-lead--line-height: 1.75;
+  --text-body-sm--line-height: 1.7;
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------- */
+@layer base {
+  html {
+    color-scheme: light;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+    scroll-padding-top: 6.5rem;
+    font-optical-sizing: auto;
+  }
+  @media (prefers-color-scheme: dark) {
+    html {
+      color-scheme: dark;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    background-color: var(--color-canvas);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    overflow-x: clip;
+  }
+  ::selection {
+    background-color: var(--color-surface-accent);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a {
+    text-underline-position: from-font;
+    text-decoration-thickness: from-font;
+  }
+  img {
+    outline: 1px solid oklch(0 0 0 / 0.1);
+    outline-offset: -1px;
+  }
+  @media (prefers-color-scheme: dark) {
+    img {
+      outline-color: oklch(1 0 0 / 0.1);
+    }
+  }
+  img.no-outline {
+    outline: none;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Components
+------------------------------------------------------------------- */
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 82rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    .container-page {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .section {
+    padding-block: 5rem;
+  }
+  @media (min-width: 64rem) {
+    .section {
+      padding-block: 8rem;
+    }
+  }
+
+  /* Double bezel: outer tray + inner core with concentric radii (28 = 22 + 6) */
+  .bezel {
+    border-radius: var(--radius-shell);
+    padding: 0.375rem;
+    background-color: oklch(0.235 0.042 267 / 0.035);
+    box-shadow: var(--shadow-ring);
+  }
+  @media (prefers-color-scheme: dark) {
+    .bezel {
+      background-color: oklch(1 0 0 / 0.04);
+    }
+  }
+  .bezel-core {
+    border-radius: var(--radius-core);
+    background-color: var(--color-surface);
+    box-shadow: var(--inset-highlight), var(--shadow-soft);
+    overflow: hidden;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.375rem 0.875rem;
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--color-ink-on-accent-soft);
+    background-color: var(--color-surface-accent);
+    white-space: nowrap;
+  }
+  html:lang(ar) .eyebrow {
+    text-transform: none;
+    font-size: var(--text-body-sm);
+  }
+
+  /* Buttons: pill + nested icon circle ("button in button") */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    border-radius: 999px;
+    padding-inline: 1.375rem;
+    font-weight: 500;
+    font-size: var(--text-body);
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition-property: transform, background-color, color, box-shadow;
+    transition-duration: 160ms, 200ms, 200ms, 200ms;
+    transition-timing-function: var(--ease-snappy), ease, ease, ease;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn[data-static]:active {
+    transform: none;
+  }
+  .btn-has-icon {
+    padding-inline-end: 0.375rem;
+  }
+  .btn-primary {
+    background-color: var(--color-action);
+    color: var(--color-on-action);
+    box-shadow: var(--shadow-float);
+  }
+  .btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-ring), 0 1px 2px oklch(0.235 0.042 267 / 0.05);
+  }
+  .btn-quiet {
+    background-color: var(--color-surface-muted);
+    color: var(--color-ink);
+  }
+  .btn-sm {
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+    font-size: var(--text-body-sm);
+    gap: 0.5rem;
+  }
+  .btn-sm.btn-has-icon {
+    padding-inline-end: 0.3125rem;
+  }
+  .btn-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+    transition: transform 250ms var(--ease-snappy);
+  }
+  .btn-sm .btn-icon {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+  .btn-secondary .btn-icon,
+  .btn-quiet .btn-icon {
+    background-color: var(--color-surface-sunken);
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background-color: var(--color-action-hover);
+    }
+    .btn-secondary:hover {
+      box-shadow: var(--shadow-ring), 0 6px 16px -8px oklch(0.235 0.042 267 / 0.2);
+    }
+    .btn-quiet:hover {
+      background-color: var(--color-surface-sunken);
+    }
+    .btn:hover .btn-icon {
+      transform: translateX(2px) scale(1.05);
+    }
+    html[dir='rtl'] .btn:hover .btn-icon {
+      transform: translateX(-2px) scale(1.05);
+    }
+  }
+
+  /* Directional icons mirror in RTL */
+  html[dir='rtl'] .flip-rtl {
+    transform: scaleX(-1);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-body-sm);
+    line-height: 1.3;
+    background-color: var(--color-surface-muted);
+    color: var(--color-ink-2);
+    box-shadow: var(--shadow-ring);
+  }
+
+  .link {
+    color: var(--color-accent-strong);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .link:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  .skip-link {
+    position: fixed;
+    inset-inline-start: 1rem;
+    top: 1rem;
+    z-index: 100;
+    transform: translateY(-200%);
+  }
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Motion
+   Entrances are opt-in: content is only hidden once JS has run (.js),
+   and reduced motion keeps a gentle fade without movement.
+------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero load-in: CSS animation so it stays smooth while the page is busy */
+.js .intro {
+  animation: rise 800ms var(--ease-snappy) both;
+  animation-delay: calc(var(--i, 0) * 80ms + 60ms);
+}
+.js .intro-media {
+  animation: settle 1000ms var(--ease-snappy) both;
+  animation-delay: 200ms;
+}
+
+/* Scroll reveal, fired once by IntersectionObserver */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 700ms var(--ease-snappy),
+    transform 700ms var(--ease-snappy);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .intro,
+  .js .intro-media {
+    animation: fade 400ms ease both;
+  }
+  .js [data-reveal] {
+    transform: none;
+    transition: opacity 400ms ease;
+    transition-delay: 0ms;
+  }
+  .btn:active {
+    transform: none;
+  }
+}

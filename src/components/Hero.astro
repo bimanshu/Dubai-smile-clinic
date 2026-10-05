@@ -1,0 +1,76 @@
+---
+import Icon from './Icon.astro';
+import Compare from './Compare.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<section class="hero relative isolate overflow-clip" aria-labelledby="hero-title">
+  <div class="hero-wash" aria-hidden="true"></div>
+  <div class="container-page grid items-center gap-12 pb-16 pt-28 sm:pt-32 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-36">
+    <div class="lg:col-span-6 xl:col-span-6">
+      <p class="eyebrow intro" style="--i:0">
+        <Icon name="seal-check" size={16} />
+        {t(ui.hero.eyebrow)}
+      </p>
+      <h1 id="hero-title" class="intro mt-6 max-w-[13ch] text-display text-ink" style="--i:1">{t(ui.hero.title)}</h1>
+      <p class="intro mt-6 max-w-[34rem] text-lead text-ink-2" style="--i:2">{t(ui.hero.sub)}</p>
+      <div class="intro mt-9 flex flex-wrap items-center gap-3" style="--i:3" data-hero-ctas>
+        <a href="#book" class="btn btn-primary btn-has-icon">
+          {t(ui.cta.book)}
+          <span class="btn-icon"><Icon name="arrow-right" size={18} class="flip-rtl" /></span>
+        </a>
+        <a href="#results" class="btn btn-secondary">{t(ui.cta.seeResults)}</a>
+      </div>
+    </div>
+
+    <div class="intro-media lg:col-span-6 lg:justify-self-end">
+      <Compare
+        lang={lang}
+        id="hero-compare"
+        before="results/smile-a-before"
+        after="results/smile-a-after"
+        altBefore={t(ui.results.alt.aBefore)}
+        altAfter={t(ui.results.alt.aAfter)}
+        sizes="(min-width: 1024px) 30rem, (min-width: 640px) 28rem, 92vw"
+        priority
+        class="hero-visual mx-auto"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  :global(.hero-visual) {
+    width: min(100%, 28rem);
+  }
+  @media (min-width: 64rem) {
+    :global(.hero-visual) {
+      width: min(30rem, calc((100dvh - 11rem) * 0.8));
+      min-width: 22rem;
+    }
+  }
+  .hero-wash {
+    position: absolute;
+    inset: -20% -10% auto auto;
+    z-index: -1;
+    width: min(70rem, 120vw);
+    height: 52rem;
+    pointer-events: none;
+    background:
+      radial-gradient(closest-side at 62% 42%, oklch(0.76 0.12 234 / 0.2), transparent 70%),
+      radial-gradient(closest-side at 80% 70%, oklch(0.835 0.094 234 / 0.16), transparent 72%);
+  }
+  :global(html[dir='rtl']) .hero-wash {
+    inset: -20% auto auto -10%;
+    transform: scaleX(-1);
+  }
+  @media (prefers-color-scheme: dark) {
+    .hero-wash {
+      background:
+        radial-gradient(closest-side at 62% 42%, oklch(0.58 0.117 234 / 0.22), transparent 70%),
+        radial-gradient(closest-side at 80% 70%, oklch(0.44 0.089 234 / 0.2), transparent 72%);
+    }
+  }
+</style>

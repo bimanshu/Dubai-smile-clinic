@@ -1,0 +1,327 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import ui, { type Lang, homePath, languages, useT } from '../i18n/ui';
+import { clinics, telHref } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'ar' : 'en';
+const links = [
+  { href: '#treatments', label: ui.nav.treatments },
+  { href: '#results', label: ui.nav.results },
+  { href: '#dentists', label: ui.nav.dentists },
+  { href: '#clinics', label: ui.nav.clinics },
+  { href: '#faq', label: ui.nav.faq },
+];
+---
+<a href="#main" class="skip-link btn btn-primary btn-sm">{t(ui.skip)}</a>
+
+<header class="nav-shell" data-nav>
+  <nav aria-label={t(ui.nav.label)} class="nav-pill">
+    <Logo lang={lang} />
+
+    <ul class="hidden items-center gap-1 lg:flex">
+      {links.map((l) => (
+        <li><a href={l.href} class="nav-link">{t(l.label)}</a></li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-1.5">
+      <a href={homePath(other)} hreflang={other} lang={other} class="btn btn-quiet btn-sm">
+        <Icon name="translate" size={18} />
+        <span>{languages[other]}</span>
+      </a>
+      <a href="#book" class="btn btn-primary btn-sm btn-has-icon hidden md:inline-flex">
+        {t(ui.cta.book)}
+        <span class="btn-icon"><Icon name="arrow-right" size={16} class="flip-rtl" /></span>
+      </a>
+      <button type="button" class="burger lg:hidden" aria-expanded="false" aria-controls="site-menu" data-menu-open>
+        <span class="sr-only">{t(ui.nav.openMenu)}</span>
+        <span class="burger-line burger-line--a" aria-hidden="true"></span>
+        <span class="burger-line burger-line--b" aria-hidden="true"></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<dialog id="site-menu" class="menu" aria-label={t(ui.nav.label)} data-menu>
+  <div class="menu-inner">
+    <div class="nav-pill nav-pill--menu">
+      <Logo lang={lang} />
+      <button type="button" class="burger is-x" data-menu-close autofocus>
+        <span class="sr-only">{t(ui.nav.closeMenu)}</span>
+        <span class="burger-line burger-line--a" aria-hidden="true"></span>
+        <span class="burger-line burger-line--b" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <ul class="menu-links">
+      {links.map((l, i) => (
+        <li style={`--i:${i}`}><a href={l.href} class="menu-link" data-menu-link>{t(l.label)}</a></li>
+      ))}
+    </ul>
+
+    <div class="menu-foot" style={`--i:${links.length}`}>
+      <a href="#book" class="btn btn-primary btn-has-icon w-full justify-between" data-menu-link>
+        {t(ui.cta.book)}
+        <span class="btn-icon"><Icon name="arrow-right" size={18} class="flip-rtl" /></span>
+      </a>
+      <p class="mt-8 text-body-sm font-medium text-ink-2">{t(ui.nav.callUs)}</p>
+      <ul class="mt-3 grid grid-cols-2 gap-2">
+        {clinics.map((c) => (
+          <li>
+            <a href={telHref(c.phone)} class="menu-call">
+              <span class="font-medium text-ink">{t(c.name)}</span>
+              <bdi dir="ltr" class="tabular text-body-sm text-ink-2">{c.phone}</bdi>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* z-index scale: skip link 100, nav 40, mobile action bar 30 (dialogs use the top layer) */
+  .nav-shell {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 40;
+    padding: 0.75rem 0.75rem 0;
+    pointer-events: none;
+  }
+  @media (min-width: 40rem) {
+    .nav-shell {
+      padding: 1rem 1rem 0;
+    }
+  }
+  .nav-pill {
+    pointer-events: auto;
+    margin-inline: auto;
+    display: flex;
+    height: 4rem;
+    max-width: 78rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-radius: 999px;
+    padding-inline: 0.75rem 0.5rem;
+    background-color: var(--color-glass);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    box-shadow:
+      var(--shadow-ring),
+      var(--inset-highlight);
+    transition:
+      background-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+  [data-nav][data-scrolled] .nav-pill {
+    background-color: var(--color-glass-strong);
+    box-shadow:
+      var(--shadow-ring),
+      var(--inset-highlight),
+      var(--shadow-float);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav-pill {
+      background-color: var(--color-surface);
+      backdrop-filter: none;
+    }
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    border-radius: 999px;
+    padding-inline: 0.875rem;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    color: var(--color-ink-2);
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+      color: var(--color-ink);
+      background-color: var(--color-surface-muted);
+    }
+  }
+
+  /* Hamburger that morphs into an X */
+  .burger {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background-color: var(--color-surface-muted);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-snappy);
+  }
+  .burger:active {
+    transform: scale(0.96);
+  }
+  @media (min-width: 64rem) {
+    [data-menu-open].burger {
+      display: none;
+    }
+  }
+  .burger-line {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.125rem;
+    height: 1.5px;
+    margin-left: -0.5625rem;
+    border-radius: 2px;
+    background-color: currentColor;
+    transition: transform 300ms var(--ease-snappy);
+  }
+  .burger-line--a {
+    transform: translateY(-3.5px);
+  }
+  .burger-line--b {
+    transform: translateY(3.5px);
+  }
+  .burger.is-x .burger-line--a {
+    transform: rotate(45deg);
+  }
+  .burger.is-x .burger-line--b {
+    transform: rotate(-45deg);
+  }
+  @starting-style {
+    .menu[open] .burger.is-x .burger-line--a {
+      transform: translateY(-3.5px);
+    }
+    .menu[open] .burger.is-x .burger-line--b {
+      transform: translateY(3.5px);
+    }
+  }
+
+  /* Full-screen menu: the frosted layer lives on ::backdrop, which blurs reliably in every engine */
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--color-ink);
+    background-color: transparent;
+    overscroll-behavior: contain;
+    opacity: 0;
+    transition:
+      opacity 250ms var(--ease-snappy),
+      display 250ms allow-discrete,
+      overlay 250ms allow-discrete;
+  }
+  .menu[open] {
+    opacity: 1;
+  }
+  @starting-style {
+    .menu[open] {
+      opacity: 0;
+    }
+  }
+  .menu::backdrop {
+    background-color: color-mix(in oklab, var(--color-canvas) 86%, transparent);
+    -webkit-backdrop-filter: blur(32px) saturate(150%);
+    backdrop-filter: blur(32px) saturate(150%);
+    opacity: 0;
+    transition:
+      opacity 250ms var(--ease-snappy),
+      display 250ms allow-discrete,
+      overlay 250ms allow-discrete;
+  }
+  .menu[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .menu[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .menu::backdrop {
+      background-color: var(--color-canvas);
+      backdrop-filter: none;
+    }
+  }
+  .menu-inner {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    padding: 0.75rem 0.75rem calc(1.5rem + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 40rem) {
+    .menu-inner {
+      padding: 1rem 1rem 2rem;
+    }
+  }
+  .nav-pill--menu {
+    width: 100%;
+    background-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .menu-links {
+    margin-top: 2.5rem;
+    padding-inline: 1rem;
+  }
+  .menu-link {
+    display: block;
+    padding-block: 0.5rem;
+    font-size: clamp(2rem, 1.4rem + 3vw, 3rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+  :global(html:lang(ar)) .menu-link {
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+  .menu-links li,
+  .menu-foot {
+    transition:
+      opacity 400ms var(--ease-snappy),
+      transform 400ms var(--ease-snappy);
+    transition-delay: calc(var(--i) * 40ms + 60ms);
+  }
+  @starting-style {
+    .menu[open] .menu-links li,
+    .menu[open] .menu-foot {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  .menu-foot {
+    margin-top: auto;
+    padding: 2rem 1rem 0;
+  }
+  .menu-call {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    border-radius: var(--radius-card);
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-ring);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-links li,
+    .menu-foot,
+    .burger-line {
+      transition: opacity 200ms ease;
+    }
+  }
+</style>

@@ -1,0 +1,365 @@
+---
+import Icon from './Icon.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+import { clinics, treatments, moreTreatments, telHref } from '../data/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const b = ui.book;
+// Set PUBLIC_BOOKING_ENDPOINT to a form backend (Formspree, Basin, your CRM webhook) that accepts a JSON POST.
+const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT ?? '';
+const allTreatments = [...treatments, ...moreTreatments];
+const messages = {
+  name: t(b.errors.name),
+  phone: t(b.errors.phone),
+  clinic: t(b.errors.clinic),
+  summary: t(b.errors.summary),
+  success: t(b.success.body),
+  failure: t(b.failure),
+};
+const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name), phone: c.phone }]));
+---
+<section id="book" class="section" aria-labelledby="book-title">
+  <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+    <div class="lg:col-span-5" data-reveal>
+      <h2 id="book-title" class="text-title">{t(b.title)}</h2>
+      <p class="mt-5 max-w-[34rem] text-lead text-ink-2">{t(b.sub)}</p>
+
+      <p class="mt-12 text-body-sm font-medium text-ink">{t(b.direct)}</p>
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        {clinics.map((c) => (
+          <li>
+            <a href={telHref(c.phone)} class="direct-call">
+              <span class="grid size-10 shrink-0 place-items-center rounded-full bg-surface-muted text-ink">
+                <Icon name="phone" size={18} />
+              </span>
+              <span class="flex min-w-0 flex-col">
+                <span class="font-medium text-ink"><span class="sr-only">{t(ui.clinics.callAria, { name: t(c.name) })}: </span><span aria-hidden="true">{t(c.name)}</span></span>
+                <bdi dir="ltr" class="tabular text-body-sm text-ink-2">{c.phone}</bdi>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="lg:col-span-7" data-reveal style="--i:1">
+      <div class="bezel">
+        <div class="bezel-core p-6 sm:p-8 lg:p-10">
+          <form
+            class="grid gap-6"
+            novalidate
+            data-booking
+            data-endpoint={endpoint}
+            data-messages={JSON.stringify(messages)}
+            data-clinics={JSON.stringify(clinicInfo)}
+          >
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div class="field">
+                <label for="bk-name" class="field-label">{t(b.name)}</label>
+                <input id="bk-name" name="name" type="text" autocomplete="name" required class="input" aria-describedby="bk-name-error" />
+                <p id="bk-name-error" class="field-error" data-error-for="name" hidden></p>
+              </div>
+              <div class="field">
+                <label for="bk-phone" class="field-label">{t(b.phone)}</label>
+                <input
+                  id="bk-phone"
+                  name="phone"
+                  type="tel"
+                  inputmode="tel"
+                  autocomplete="tel"
+                  required
+                  dir="ltr"
+                  placeholder={t(b.phonePlaceholder)}
+                  class="input tabular"
+                  aria-describedby="bk-phone-hint bk-phone-error"
+                />
+                <p id="bk-phone-hint" class="field-hint">{t(b.phoneHint)}</p>
+                <p id="bk-phone-error" class="field-error" data-error-for="phone" hidden></p>
+              </div>
+            </div>
+
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div class="field">
+                <label for="bk-clinic" class="field-label">{t(b.clinic)}</label>
+                <div class="select-wrap">
+                  <select id="bk-clinic" name="clinic" required class="input select" aria-describedby="bk-clinic-error">
+                    <option value="">{t(b.clinicPlaceholder)}</option>
+                    {clinics.map((c) => <option value={c.id}>{t(c.name)}</option>)}
+                  </select>
+                  <Icon name="caret-down" size={16} class="select-caret" />
+                </div>
+                <p id="bk-clinic-error" class="field-error" data-error-for="clinic" hidden></p>
+              </div>
+              <div class="field">
+                <label for="bk-treatment" class="field-label">
+                  {t(b.treatment)} <span class="font-normal text-ink-3">({t(b.optional)})</span>
+                </label>
+                <div class="select-wrap">
+                  <select id="bk-treatment" name="treatment" class="input select">
+                    <option value="">{t(b.notSure)}</option>
+                    {allTreatments.map((tr) => <option value={tr.slug}>{t(tr.name)}</option>)}
+                  </select>
+                  <Icon name="caret-down" size={16} class="select-caret" />
+                </div>
+              </div>
+            </div>
+
+            <fieldset class="field">
+              <legend class="field-label">
+                {t(b.time)} <span class="font-normal text-ink-3">({t(b.optional)})</span>
+              </legend>
+              <div class="segmented">
+                {(['morning', 'afternoon', 'evening'] as const).map((k) => (
+                  <label class="segment">
+                    <input type="radio" name="time" value={k} class="sr-only" />
+                    <span>{t(b[k])}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div class="field">
+              <label for="bk-message" class="field-label">
+                {t(b.message)} <span class="font-normal text-ink-3">({t(b.optional)})</span>
+              </label>
+              <textarea id="bk-message" name="message" rows="3" class="input textarea"></textarea>
+            </div>
+
+            <div class="flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <p class="max-w-[36ch] text-caption text-ink-3">{t(b.consent)}</p>
+              <button type="submit" class="btn btn-primary btn-has-icon w-full justify-between sm:w-auto" data-submit>
+                <span>{t(b.submit)}</span>
+                <span class="btn-icon">
+                  <span class="icon-swap" data-icon="idle"><Icon name="arrow-right" size={18} class="flip-rtl" /></span>
+                  <span class="icon-swap" data-icon="busy"><Icon name="circle-notch" size={18} class="spin" /></span>
+                </span>
+              </button>
+            </div>
+            <div role="alert" class="form-alert" data-form-alert hidden>
+              <Icon name="warning-circle" size={20} class="mt-0.5 shrink-0" />
+              <p data-form-alert-text></p>
+            </div>
+          </form>
+
+          <div class="success" data-booking-success hidden>
+            <span class="grid size-14 place-items-center rounded-full bg-surface-accent text-ink-on-accent-soft">
+              <Icon name="check-circle" size={28} />
+            </span>
+            <h3 class="mt-6 text-heading" tabindex="-1" data-success-title>{t(b.success.title)}</h3>
+            <p class="mt-3 max-w-[44ch] text-body text-ink-2" data-success-text></p>
+            <button type="button" class="btn btn-secondary mt-8" data-booking-reset>{t(b.success.again)}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .direct-call {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    border-radius: var(--radius-card);
+    padding: 0.75rem;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-ring);
+    transition:
+      box-shadow 200ms ease,
+      transform 160ms var(--ease-snappy);
+  }
+  .direct-call:active {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .direct-call:hover {
+      box-shadow: var(--shadow-ring), var(--shadow-soft);
+    }
+  }
+  .field {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    min-width: 0;
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .field-label {
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    color: var(--color-ink);
+    padding: 0;
+  }
+  legend.field-label {
+    margin-bottom: 0.5rem;
+  }
+  .field-hint {
+    font-size: var(--text-caption);
+    color: var(--color-ink-3);
+  }
+  .field-error {
+    display: flex;
+    gap: 0.375rem;
+    font-size: var(--text-body-sm);
+    color: var(--color-danger);
+  }
+  .input {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: var(--radius-input);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-line-strong);
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .input::placeholder {
+    color: var(--color-ink-3);
+  }
+  :global(html[dir='rtl']) .input[dir='ltr']::placeholder {
+    text-align: right;
+  }
+  .input:focus-visible {
+    outline: none;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-focus) 30%, transparent);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+  .input[aria-invalid='true']:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger) 25%, transparent);
+  }
+  @media (forced-colors: active) {
+    .input:focus-visible {
+      outline: 2px solid Highlight;
+    }
+  }
+  .textarea {
+    resize: vertical;
+    min-height: 6rem;
+  }
+  .select-wrap {
+    position: relative;
+  }
+  .select {
+    appearance: none;
+    padding-inline-end: 2.75rem;
+    cursor: pointer;
+  }
+  .select-wrap :global(.select-caret) {
+    position: absolute;
+    inset-inline-end: 1rem;
+    top: 50%;
+    translate: 0 -50%;
+    pointer-events: none;
+    color: var(--color-ink-2);
+  }
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+    border-radius: 999px;
+    padding: 0.25rem;
+    background-color: var(--color-surface-muted);
+    box-shadow: var(--shadow-ring);
+  }
+  .segment {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    padding-inline: 0.5rem;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    text-align: center;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .segment:has(input:checked) {
+    color: var(--color-ink);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-ring), 0 4px 12px -6px oklch(0.235 0.042 267 / 0.3);
+  }
+  .segment:has(input:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .form-alert {
+    display: flex;
+    gap: 0.625rem;
+    border-radius: var(--radius-card);
+    padding: 1rem;
+    font-size: var(--text-body-sm);
+    color: var(--color-danger);
+    background-color: color-mix(in oklab, var(--color-danger) 8%, var(--color-surface));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-danger) 25%, transparent);
+  }
+  .form-alert :global(a) {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  /* Submit icon swap: arrow <-> spinner (scale 0.25 -> 1, blur 4px -> 0) */
+  .btn-icon {
+    position: relative;
+  }
+  .icon-swap {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition:
+      opacity 250ms var(--ease-icon),
+      scale 250ms var(--ease-icon),
+      filter 250ms var(--ease-icon);
+  }
+  [data-icon='busy'],
+  [data-loading] [data-icon='idle'] {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+  [data-loading] [data-icon='busy'] {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+  .icon-swap :global(.spin) {
+    animation: spin 800ms linear infinite;
+  }
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+  [data-loading] {
+    cursor: progress;
+  }
+
+  .success {
+    padding-block: 2rem;
+  }
+  .success:not([hidden]) {
+    animation: rise 500ms var(--ease-snappy) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .success:not([hidden]) {
+      animation: fade 300ms ease both;
+    }
+    .icon-swap :global(.spin) {
+      animation-duration: 1600ms;
+    }
+  }
+</style>

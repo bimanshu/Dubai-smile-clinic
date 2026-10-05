@@ -1,0 +1,27 @@
+---
+import ui, { type Lang, useT } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<section aria-label={t(ui.stats.label)} class="pb-6">
+  <div class="container-page">
+    <dl class="grid grid-cols-2 border-y border-line lg:grid-cols-4">
+      {ui.stats.items.map((s, i) => (
+        <div
+          class:list={[
+            'flex flex-col-reverse justify-end gap-3 px-4 py-8 sm:px-6 lg:py-10',
+            i % 2 === 1 && 'border-s border-line',
+            i >= 2 && 'border-t border-line lg:border-t-0',
+            i === 2 && 'lg:border-s',
+          ]}
+          data-reveal
+          style={`--i:${i}`}
+        >
+          <dt class="max-w-[16rem] text-body-sm text-ink-2">{t(s.label)}</dt>
+          <dd class="tabular text-stat text-ink"><bdi>{t(s.value)}</bdi></dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

@@ -1,0 +1,111 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import ui, { type Lang, homePath, languages, useT } from '../i18n/ui';
+import { clinics, socials, telHref, treatments } from '../data/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'ar' : 'en';
+const explore = [
+  { href: '#treatments', label: ui.nav.treatments },
+  { href: '#results', label: ui.nav.results },
+  { href: '#dentists', label: ui.nav.dentists },
+  { href: '#clinics', label: ui.nav.clinics },
+  { href: '#faq', label: ui.nav.faq },
+  { href: '#book', label: ui.cta.book },
+];
+---
+<footer class="border-t border-line bg-surface-muted pb-32 pt-16 md:pb-12 lg:pt-20">
+  <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-8">
+    <div class="lg:col-span-4">
+      <Logo lang={lang} />
+      <p class="mt-6 max-w-[34ch] text-body-sm text-ink-2">{t(ui.footer.about)}</p>
+      <ul class="mt-6 flex gap-2" aria-label={t(ui.footer.follow)}>
+        {socials.map((s) => (
+          <li>
+            <a href={s.href} target="_blank" rel="noopener" class="social" aria-label={`${s.name} ${t(ui.cta.newTab)}`}>
+              <Icon name={s.icon} size={20} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <nav class="lg:col-span-3" aria-labelledby="ft-clinics">
+      <h2 id="ft-clinics" class="text-body-sm font-semibold text-ink">{t(ui.footer.clinics)}</h2>
+      <ul class="mt-4 grid gap-3">
+        {clinics.map((c) => (
+          <li class="text-body-sm">
+            <a href={telHref(c.phone)} class="footer-link flex flex-col">
+              <span class="text-ink"><span class="sr-only">{t(ui.clinics.callAria, { name: t(c.name) })}: </span><span aria-hidden="true">{t(c.name)}</span></span>
+              <bdi dir="ltr" class="tabular text-ink-2">{c.phone}</bdi>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="lg:col-span-3" aria-labelledby="ft-treatments">
+      <h2 id="ft-treatments" class="text-body-sm font-semibold text-ink">{t(ui.footer.treatments)}</h2>
+      <ul class="mt-4 grid gap-2.5">
+        {treatments.map((tr) => (
+          <li><a href="#treatments" class="footer-link text-body-sm text-ink-2" data-show-treatment={tr.slug}>{t(tr.name)}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="lg:col-span-2" aria-labelledby="ft-explore">
+      <h2 id="ft-explore" class="text-body-sm font-semibold text-ink">{t(ui.footer.explore)}</h2>
+      <ul class="mt-4 grid gap-2.5">
+        {explore.map((l) => (
+          <li><a href={l.href} class="footer-link text-body-sm text-ink-2">{t(l.label)}</a></li>
+        ))}
+        <li class="pt-2">
+          <a href={homePath(other)} hreflang={other} lang={other} class="footer-link inline-flex items-center gap-2 text-body-sm text-ink">
+            <Icon name="translate" size={16} />
+            {languages[other]}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container-page mt-16 border-t border-line pt-8">
+    <p class="text-caption text-ink-3">{t(ui.footer.rights, { year: String(new Date().getFullYear()) })}</p>
+  </div>
+</footer>
+
+<style>
+  .footer-link {
+    border-radius: 0.25rem;
+    transition: color 150ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover {
+      color: var(--color-ink);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+  .social {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    color: var(--color-ink-2);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-ring);
+    transition:
+      color 150ms ease,
+      transform 160ms var(--ease-snappy);
+  }
+  .social:active {
+    transform: scale(0.96);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .social:hover {
+      color: var(--color-ink);
+    }
+  }
+</style>

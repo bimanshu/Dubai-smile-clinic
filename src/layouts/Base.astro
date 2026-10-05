@@ -1,0 +1,95 @@
+---
+import '../styles/global.css';
+import ui, { type Lang, dirOf, useT } from '../i18n/ui';
+import { clinics, faqs } from '../data/site';
+import { img } from '../lib/images';
+import { getImage } from 'astro:assets';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const site = Astro.site!.toString().replace(/\/$/, '');
+const enUrl = `${site}/`;
+const arUrl = `${site}/ar/`;
+const canonical = lang === 'ar' ? arUrl : enUrl;
+const og = await getImage({ src: img('results/smile-a-after'), width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+
+const dayRange = (from: string[], [opens, closes]: [string, string]) => ({
+  '@type': 'OpeningHoursSpecification',
+  dayOfWeek: from,
+  opens,
+  closes,
+});
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${site}/#organization`,
+      name: 'Dubai Smile Dental Clinic',
+      url: enUrl,
+      telephone: clinics[0].phone,
+      sameAs: [
+        'https://www.instagram.com/dubaismile_dubai/',
+        'https://www.facebook.com/DXBDubaiSmile',
+        'https://www.linkedin.com/company/dubai-smile-dental-clinic/',
+      ],
+    },
+    ...clinics.map((c) => ({
+      '@type': 'Dentist',
+      '@id': `${site}/#clinic-${c.id}`,
+      name: `Dubai Smile Dental Clinic, ${c.name.en}`,
+      parentOrganization: { '@id': `${site}/#organization` },
+      telephone: c.phone,
+      address: { '@type': 'PostalAddress', streetAddress: c.address[lang], addressCountry: 'AE' },
+      openingHoursSpecification: [
+        dayRange(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], c.hours.weekdays),
+        dayRange(['Friday'], c.hours.friday),
+      ],
+    })),
+    {
+      '@type': 'FAQPage',
+      inLanguage: lang,
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q[lang],
+        acceptedAnswer: { '@type': 'Answer', text: f.a[lang] },
+      })),
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+    <title>{t(ui.meta.title)}</title>
+    <meta name="description" content={t(ui.meta.description)} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="ar" href={arUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    <meta name="theme-color" content="#f8f9fc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d111b" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    {lang === 'ar' && <link rel="preload" href="/fonts/plex-arabic-600.woff2" as="font" type="font/woff2" crossorigin />}
+    {lang === 'ar' && <link rel="preload" href="/fonts/plex-arabic-400.woff2" as="font" type="font/woff2" crossorigin />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t(ui.meta.siteName)} />
+    <meta property="og:locale" content={lang === 'ar' ? 'ar_AE' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'ar' ? 'en_US' : 'ar_AE'} />
+    <meta property="og:title" content={t(ui.meta.title)} />
+    <meta property="og:description" content={t(ui.meta.description)} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(og.src, site).toString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="font-sans">
+    <slot />
+  </body>
+</html>
