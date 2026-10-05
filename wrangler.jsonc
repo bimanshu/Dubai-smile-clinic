@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deploy: `npm run build` produces dist/, `npx wrangler deploy` uploads it.
+// "name" must match the Worker/project name in the Cloudflare dashboard.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dubai-smile-clinic-demo-website",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

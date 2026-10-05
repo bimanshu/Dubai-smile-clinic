@@ -14,6 +14,8 @@ npm run check     # type-check
 
 `dist/` is plain HTML, CSS, JS and images, so it deploys to any static host (Netlify, Vercel, Cloudflare Pages, S3, the existing server).
 
+Cloudflare Workers: `wrangler.jsonc` is set up for static assets. Build command `npm run build`, deploy command `npx wrangler deploy`. The `name` in `wrangler.jsonc` must match the Worker name in the dashboard. `.node-version` pins Node 22, which Astro 7 needs.
+
 ## Demo mode (on by default)
 
 While the site is being reviewed, demo mode is on (`src/lib/config.ts`):
