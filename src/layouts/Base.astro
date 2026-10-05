@@ -4,6 +4,7 @@ import ui, { type Lang, dirOf, useT } from '../i18n/ui';
 import { clinics, faqs } from '../data/site';
 import { img } from '../lib/images';
 import { getImage } from 'astro:assets';
+import { DEMO } from '../lib/config';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -60,7 +61,7 @@ const jsonLd = {
 };
 ---
 <!doctype html>
-<html lang={lang} dir={dirOf(lang)} class="no-js">
+<html lang={lang} dir={dirOf(lang)} class="no-js" data-demo={DEMO ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -71,6 +72,7 @@ const jsonLd = {
     <link rel="alternate" hreflang="en" href={enUrl} />
     <link rel="alternate" hreflang="ar" href={arUrl} />
     <link rel="alternate" hreflang="x-default" href={enUrl} />
+    {DEMO && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#f8f9fc" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0d111b" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
@@ -90,6 +92,12 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="font-sans">
+    {DEMO && (
+      <>
+        <p class="demo-strip" role="note">{t(ui.demo.banner)}</p>
+        <div class="demo-spacer" aria-hidden="true"></div>
+      </>
+    )}
     <slot />
   </body>
 </html>

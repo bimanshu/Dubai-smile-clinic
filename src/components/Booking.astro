@@ -2,12 +2,14 @@
 import Icon from './Icon.astro';
 import ui, { type Lang, useT } from '../i18n/ui';
 import { clinics, treatments, moreTreatments, telHref } from '../data/site';
+import { DEMO, BOOKING_ENDPOINT } from '../lib/config';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
 const b = ui.book;
-// Set PUBLIC_BOOKING_ENDPOINT to a form backend (Formspree, Basin, your CRM webhook) that accepts a JSON POST.
-const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT ?? '';
+// PUBLIC_BOOKING_ENDPOINT: a form backend (Formspree, Basin, your CRM webhook) that accepts a JSON POST.
+// Always empty in demo mode, so nothing is ever sent from a preview.
+const endpoint = BOOKING_ENDPOINT;
 const allTreatments = [...treatments, ...moreTreatments];
 const messages = {
   name: t(b.errors.name),
@@ -15,7 +17,7 @@ const messages = {
   clinic: t(b.errors.clinic),
   summary: t(b.errors.summary),
   success: t(b.success.body),
-  failure: t(b.failure),
+  failure: t(DEMO ? ui.demo.submitted : b.failure),
 };
 const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name), phone: c.phone }]));
 ---
@@ -53,6 +55,7 @@ const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name
             data-endpoint={endpoint}
             data-messages={JSON.stringify(messages)}
             data-clinics={JSON.stringify(clinicInfo)}
+            data-demo={DEMO ? '' : undefined}
           >
             <div class="grid gap-6 sm:grid-cols-2">
               <div class="field">
@@ -127,7 +130,14 @@ const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name
             </div>
 
             <div class="flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p class="max-w-[36ch] text-caption text-ink-3">{t(b.consent)}</p>
+              {DEMO ? (
+                <p class="flex max-w-[36ch] gap-2 text-caption text-ink-2">
+                  <Icon name="info" size={16} class="mt-px shrink-0" />
+                  {t(ui.demo.form)}
+                </p>
+              ) : (
+                <p class="max-w-[36ch] text-caption text-ink-3">{t(b.consent)}</p>
+              )}
               <button type="submit" class="btn btn-primary btn-has-icon w-full justify-between sm:w-auto" data-submit>
                 <span>{t(b.submit)}</span>
                 <span class="btn-icon">
@@ -136,8 +146,8 @@ const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name
                 </span>
               </button>
             </div>
-            <div role="alert" class="form-alert" data-form-alert hidden>
-              <Icon name="warning-circle" size={20} class="mt-0.5 shrink-0" />
+            <div role={DEMO ? 'status' : 'alert'} class="form-alert" data-form-alert data-tone={DEMO ? 'info' : 'error'} hidden>
+              <Icon name={DEMO ? 'info' : 'warning-circle'} size={20} class="mt-0.5 shrink-0" />
               <p data-form-alert-text></p>
             </div>
           </form>
@@ -306,7 +316,13 @@ const clinicInfo = Object.fromEntries(clinics.map((c) => [c.id, { name: t(c.name
     background-color: color-mix(in oklab, var(--color-danger) 8%, var(--color-surface));
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-danger) 25%, transparent);
   }
+  .form-alert[data-tone='info'] {
+    color: var(--color-ink);
+    background-color: var(--color-surface-accent);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
   .form-alert :global(a) {
+    white-space: nowrap;
     font-weight: 600;
     text-decoration: underline;
   }

@@ -14,11 +14,27 @@ npm run check     # type-check
 
 `dist/` is plain HTML, CSS, JS and images, so it deploys to any static host (Netlify, Vercel, Cloudflare Pages, S3, the existing server).
 
+## Demo mode (on by default)
+
+While the site is being reviewed, demo mode is on (`src/lib/config.ts`):
+
+- a slim "Design preview. Not the live Dubai Smile website." strip sits above the nav, in both languages
+- search engines are kept out (`noindex` meta tag and a `Disallow: /` robots.txt), so a preview never competes with dubaismile.com
+- the booking form never sends anything; on submit it says so and offers tap-to-call for the chosen clinic
+
+For launch, set `PUBLIC_DEMO=false` and `PUBLIC_BOOKING_ENDPOINT` (see `.env.example`).
+
+## Offline preview files
+
+```bash
+npm run preview:file
+```
+
+This writes `preview/dubai-smile-preview-en.html` and `preview/dubai-smile-preview-ar.html` (about 2.5 MB each). Each is fully self-contained, with images, fonts and script inlined. Double-click to open it in any modern browser; no server or internet needed. The language switch jumps between the two files.
+
 ## Booking form
 
-The form POSTs JSON to `PUBLIC_BOOKING_ENDPOINT` (see `.env.example`). Any form backend or CRM webhook that accepts JSON works (Formspree, Basin, Zapier, HubSpot, etc.).
-
-Without an endpoint, the form still validates. On submit it tells the patient to call the clinic they picked, with a tap-to-call link, so nothing is silently lost.
+With demo mode off, the form POSTs JSON to `PUBLIC_BOOKING_ENDPOINT`. Any form backend or CRM webhook that accepts JSON works (Formspree, Basin, Zapier, HubSpot, etc.). If no endpoint is set, the form still validates and tells the patient to call the clinic they picked, with a tap-to-call link.
 
 Payload: `name, phone, clinic, treatment, preferredTime, message, language, page`.
 

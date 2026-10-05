@@ -252,7 +252,7 @@ html:lang(ar) {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
-    scroll-padding-top: 6.5rem;
+    scroll-padding-top: calc(6.5rem + var(--preview-h, 0rem));
     font-optical-sizing: auto;
   }
   @media (prefers-color-scheme: dark) {
@@ -317,6 +317,36 @@ html:lang(ar) {
   [hidden] {
     display: none !important;
   }
+}
+
+/* ------------------------------------------------------------------
+   Demo mode strip (see src/lib/config.ts)
+------------------------------------------------------------------- */
+html[data-demo] {
+  --preview-h: 2rem;
+}
+.demo-strip {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 41;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--preview-h);
+  padding-inline: 1rem;
+  overflow: hidden;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-on-action);
+  background-color: var(--color-action);
+}
+.demo-spacer {
+  height: var(--preview-h);
 }
 
 /* ------------------------------------------------------------------

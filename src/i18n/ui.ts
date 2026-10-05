@@ -37,6 +37,14 @@ const ui = {
     callUs: { en: 'Call a clinic', ar: 'اتصل بعيادة' },
   },
   skip: { en: 'Skip to content', ar: 'انتقل إلى المحتوى' },
+  demo: {
+    banner: { en: 'Design preview. Not the live Dubai Smile website.', ar: 'معاينة للتصميم. هذا ليس موقع ابتسامة دبي الرسمي.' },
+    form: { en: 'This is a design preview, so requests aren’t sent.', ar: 'هذه معاينة للتصميم، لذا لا تُرسل الطلبات.' },
+    submitted: {
+      en: 'Design preview: nothing was sent. To book, call {clinic} on {phone}.',
+      ar: 'معاينة للتصميم: لم يُرسل أي شيء. للحجز، اتصل بعيادة {clinic} على الرقم {phone}.',
+    },
+  },
   cta: {
     book: { en: 'Book a consultation', ar: 'احجز استشارة' },
     call: { en: 'Call', ar: 'اتصل' },
