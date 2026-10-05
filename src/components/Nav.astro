@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import ui, { type Lang, homePath, languages, useT } from '../i18n/ui';
 import { clinics, telHref } from '../data/site';
 
@@ -33,6 +34,7 @@ const links = [
         <Icon name="translate" size={18} />
         <span class="max-[22.5rem]:sr-only">{languages[other]}</span>
       </a>
+      <ThemeToggle lang={lang} class="max-sm:hidden" />
       <a href="#book" class="btn btn-primary btn-sm btn-has-icon hidden md:inline-flex">
         {t(ui.cta.book)}
         <span class="btn-icon"><Icon name="arrow-right" size={16} class="flip-rtl" /></span>
@@ -64,6 +66,7 @@ const links = [
     </ul>
 
     <div class="menu-foot" style={`--i:${links.length}`}>
+      <ThemeToggle lang={lang} variant="row" class="mb-3" />
       <a href="#book" class="btn btn-primary btn-has-icon w-full justify-between" data-menu-link>
         {t(ui.cta.book)}
         <span class="btn-icon"><Icon name="arrow-right" size={18} class="flip-rtl" /></span>

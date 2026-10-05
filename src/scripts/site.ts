@@ -550,8 +550,61 @@ function initMobileBar() {
 }
 
 /* ------------------------------------------------------------------
+   Theme toggle (html[data-theme] is set before paint in Base.astro)
+------------------------------------------------------------------- */
+function initTheme() {
+  const root = document.documentElement;
+  const toggles = $$('[data-theme-toggle]');
+  const meta = $<HTMLMetaElement>('meta[name="theme-color"]');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const stored = () => {
+    try {
+      return localStorage.getItem('ds-theme');
+    } catch {
+      return null;
+    }
+  };
+
+  const sync = () => {
+    const dark = root.dataset.theme === 'dark';
+    toggles.forEach((b) => b.setAttribute('aria-pressed', String(dark)));
+    if (meta) meta.content = dark ? '#0d111b' : '#f8f9fc';
+  };
+
+  // A theme flip changes nearly every color at once; switch instantly instead of cross-fading
+  // (the toggle's own icon swap is exempt so it still animates).
+  const apply = (theme: 'light' | 'dark') => {
+    const freeze = document.createElement('style');
+    freeze.textContent = '*:not(.theme-icon):not(.switch):not(.switch-thumb),*::before,*::after{transition:none!important}';
+    document.head.append(freeze);
+    root.dataset.theme = theme;
+    sync();
+    void getComputedStyle(document.body).opacity;
+    requestAnimationFrame(() => freeze.remove());
+  };
+
+  toggles.forEach((b) =>
+    b.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      apply(next);
+      try {
+        localStorage.setItem('ds-theme', next);
+      } catch {
+        /* private mode: the choice just won't persist */
+      }
+    }),
+  );
+  // Until someone picks, keep following the system setting
+  system.addEventListener('change', (e) => {
+    if (!stored()) apply(e.matches ? 'dark' : 'light');
+  });
+  sync();
+}
+
+/* ------------------------------------------------------------------
    Boot
 ------------------------------------------------------------------- */
+initTheme();
 initReveal();
 initNavState();
 initMenu();

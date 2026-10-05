@@ -35,6 +35,7 @@ const ui = {
     closeMenu: { en: 'Close menu', ar: 'إغلاق القائمة' },
     switchLang: { en: 'Switch to Arabic', ar: 'التبديل إلى الإنجليزية' },
     callUs: { en: 'Call a clinic', ar: 'اتصل بعيادة' },
+    darkMode: { en: 'Dark mode', ar: 'الوضع الداكن' },
   },
   skip: { en: 'Skip to content', ar: 'انتقل إلى المحتوى' },
   demo: {

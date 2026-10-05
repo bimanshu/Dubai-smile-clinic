@@ -66,6 +66,7 @@ To edit content, change `src/i18n/ui.ts` and `src/data/site.ts`. Every string ha
 ## Design system
 
 - **Color.** One accent: the blue from the Dubai Smile logo (`#019cd6`, hue 234). Neutrals are a cool porcelain ramp ending in the brand navy. Every text pair is measured against WCAG AA in both themes.
+- **Light and dark.** The page starts in the visitor's system theme. The sun/moon toggle in the nav (a switch in the phone menu) overrides it, and the choice is remembered across pages and visits. The theme is set before first paint, so there's no flash. Dark values live in one `:root[data-theme='dark']` block in `global.css`.
 - **Type.** A semantic scale (`text-display`, `text-title`, `text-heading` and so on). Arabic gets no letter-spacing and taller line heights.
 - **Shape.** Buttons, chips and tabs are full pills. Media and cards use a double bezel: a 28px shell around a 22px core.
 - **Motion.** Purposeful only: a hero load-in, one-time scroll reveals, a one-time "peek" that shows the before/after is draggable, the sliding tab indicator, button press feedback, and the menu and sheet transitions. Everything respects `prefers-reduced-motion`.

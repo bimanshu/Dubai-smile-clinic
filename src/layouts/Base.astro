@@ -65,7 +65,19 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+    <meta name="theme-color" content="#f8f9fc" />
+    <script is:inline>
+      // Runs before first paint: JS flag + theme (saved toggle choice, else the system setting)
+      (function () {
+        var d = document.documentElement;
+        d.classList.replace('no-js', 'js');
+        var t = null;
+        try { t = localStorage.getItem('ds-theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        d.dataset.theme = t;
+        document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#0d111b' : '#f8f9fc';
+      })();
+    </script>
     <title>{t(ui.meta.title)}</title>
     <meta name="description" content={t(ui.meta.description)} />
     <link rel="canonical" href={canonical} />
@@ -73,8 +85,6 @@ const jsonLd = {
     <link rel="alternate" hreflang="ar" href={arUrl} />
     <link rel="alternate" hreflang="x-default" href={enUrl} />
     {DEMO && <meta name="robots" content="noindex, nofollow" />}
-    <meta name="theme-color" content="#f8f9fc" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d111b" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />

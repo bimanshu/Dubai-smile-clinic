@@ -1,0 +1,98 @@
+---
+// Light/dark switch. aria-pressed = dark mode on. The page script keeps every toggle in sync.
+import Icon from './Icon.astro';
+import ui, { type Lang, useT } from '../i18n/ui';
+interface Props { lang: Lang; variant?: 'icon' | 'row'; class?: string }
+const { lang, variant = 'icon', class: cls = '' } = Astro.props;
+const t = useT(lang);
+---
+{variant === 'icon' ? (
+  <button type="button" class:list={['theme-toggle btn btn-quiet btn-sm', cls]} aria-pressed="false" data-theme-toggle>
+    <span class="theme-icons" aria-hidden="true">
+      <span class="theme-icon theme-icon--moon"><Icon name="moon" size={18} /></span>
+      <span class="theme-icon theme-icon--sun"><Icon name="sun" size={18} /></span>
+    </span>
+    <span class="sr-only">{t(ui.nav.darkMode)}</span>
+  </button>
+) : (
+  <button type="button" class:list={['theme-toggle btn btn-quiet w-full justify-between', cls]} aria-pressed="false" data-theme-toggle>
+    <span>{t(ui.nav.darkMode)}</span>
+    <span class="switch" aria-hidden="true"><span class="switch-thumb"></span></span>
+  </button>
+)}
+
+<style>
+  .theme-toggle.btn-sm {
+    width: 2.5rem;
+    padding: 0;
+  }
+  .theme-icons {
+    position: relative;
+    display: grid;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+  /* Contextual icon swap: scale 0.25 -> 1, opacity 0 -> 1, blur 4px -> 0 */
+  .theme-icon {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition:
+      opacity 300ms var(--ease-icon),
+      scale 300ms var(--ease-icon),
+      filter 300ms var(--ease-icon);
+  }
+  .theme-icon--sun,
+  :global(html[data-theme='dark']) .theme-icon--moon {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+  :global(html[data-theme='dark']) .theme-icon--sun {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+
+  /* Row variant (mobile menu): a small switch */
+  .switch {
+    position: relative;
+    width: 2.75rem;
+    height: 1.625rem;
+    border-radius: 999px;
+    background-color: var(--color-surface-sunken);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    transition: background-color 200ms ease;
+  }
+  .switch-thumb {
+    position: absolute;
+    top: 0.1875rem;
+    inset-inline-start: 0.1875rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    background-color: var(--color-surface);
+    box-shadow: 0 1px 3px oklch(0 0 0 / 0.25);
+    transition: transform 250ms var(--ease-snappy);
+  }
+  :global(html[data-theme='dark']) .switch {
+    background-color: var(--color-accent);
+  }
+  :global(html[data-theme='dark']) .switch-thumb {
+    transform: translateX(1.125rem);
+  }
+  :global(html[dir='rtl'][data-theme='dark']) .switch-thumb {
+    transform: translateX(-1.125rem);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-icon {
+      transition: opacity 150ms ease;
+      scale: 1 !important;
+      filter: none !important;
+    }
+    .switch-thumb {
+      transition: none;
+    }
+  }
+</style>

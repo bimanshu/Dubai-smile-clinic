@@ -59,18 +59,11 @@ const t = useT(lang);
     height: 52rem;
     pointer-events: none;
     background:
-      radial-gradient(closest-side at 62% 42%, oklch(0.76 0.12 234 / 0.2), transparent 70%),
-      radial-gradient(closest-side at 80% 70%, oklch(0.835 0.094 234 / 0.16), transparent 72%);
+      radial-gradient(closest-side at 62% 42%, var(--wash-a), transparent 70%),
+      radial-gradient(closest-side at 80% 70%, var(--wash-b), transparent 72%);
   }
   :global(html[dir='rtl']) .hero-wash {
     inset: -20% auto auto -10%;
     transform: scaleX(-1);
-  }
-  @media (prefers-color-scheme: dark) {
-    .hero-wash {
-      background:
-        radial-gradient(closest-side at 62% 42%, oklch(0.58 0.117 234 / 0.22), transparent 70%),
-        radial-gradient(closest-side at 80% 70%, oklch(0.44 0.089 234 / 0.2), transparent 72%);
-    }
   }
 </style>
