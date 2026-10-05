@@ -8,7 +8,7 @@ const { lang, class: cls = '' } = Astro.props;
 const t = useT(lang);
 ---
 <a href={homePath(lang)} class:list={['inline-flex items-center gap-2 rounded-full', cls]} dir="ltr">
-  <span class="grid size-8 place-items-center rounded-full bg-surface-accent text-logo-blue" aria-hidden="true">
+  <span class="grid size-8 place-items-center rounded-full bg-surface-accent text-logo-blue max-xs:hidden" aria-hidden="true">
     <Icon name="tooth" size={18} />
   </span>
   <svg
@@ -17,7 +17,7 @@ const t = useT(lang);
     viewBox="0 0 168 34"
     width="168"
     height="34"
-    class="logo-mark overflow-visible"
+    class="logo-mark h-auto w-[8.75rem] overflow-visible xs:w-[10.5rem]"
   >
     <text x="0" y="15" font-size="17" font-weight="700" letter-spacing="-0.34">
       <tspan class="fill-logo-red">DUBAI</tspan><tspan class="fill-logo-blue">SMILE</tspan>

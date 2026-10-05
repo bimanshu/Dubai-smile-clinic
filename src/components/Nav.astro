@@ -31,7 +31,7 @@ const links = [
     <div class="flex items-center gap-1.5">
       <a href={homePath(other)} hreflang={other} lang={other} class="btn btn-quiet btn-sm">
         <Icon name="translate" size={18} />
-        <span>{languages[other]}</span>
+        <span class="max-[22.5rem]:sr-only">{languages[other]}</span>
       </a>
       <a href="#book" class="btn btn-primary btn-sm btn-has-icon hidden md:inline-flex">
         {t(ui.cta.book)}
@@ -106,7 +106,7 @@ const links = [
     max-width: 78rem;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.5rem;
     border-radius: 999px;
     padding-inline: 0.75rem 0.5rem;
     background-color: var(--color-glass);
