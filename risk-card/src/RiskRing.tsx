@@ -15,20 +15,39 @@ const FAR = 118;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** The tooltip. Its width follows its words, so moving to another level eases the box; each changed
- *  word (the name, the count, the percent) comes in with a 2px blur and a fade, keyed so it replays. */
-function RingTip({ label, count, total, x, y }: { label: string; count: number; total: number; x: number; y: number }) {
+interface TipLevel { label: string; count: number }
+
+/** The tooltip's words for one level: its name, then the count in bold and the percent. */
+function TipText({ label, count, total }: TipLevel & { total: number }) {
+  return (
+    <>
+      <span>{label}</span>
+      <span><b>{formatCount(count)}</b>{' · '}{percent(count, total)}%</span>
+    </>
+  );
+}
+
+/** The tooltip. Its width follows its words, so moving to another level eases the box. The switch
+ *  is softened for the video: the level just left stays on top, blurring and fading out, while the
+ *  new one blurs in under it. */
+function RingTip({ label, count, total, x, y }: TipLevel & { total: number; x: number; y: number }) {
   const { outer, inner } = useMorphWidth<HTMLDivElement>();
+  const [shown, setShown] = useState<TipLevel>({ label, count });
+  const [leaving, setLeaving] = useState<TipLevel | null>(null);
+  if (shown.label !== label) {
+    setLeaving(shown);
+    setShown({ label, count });
+  }
   return (
     <div ref={outer} aria-hidden="true" className="ring-tip" style={{ left: x, top: y - OFFSET }}>
       <span ref={inner} className="ring-tip-inner">
-        <span key={label} className="swap-in">{label}</span>
-        <span>
-          <b key={`n${count}`} className="swap-in">{formatCount(count)}</b>
-          {' · '}
-          <span key={`p${count}/${total}`} className="swap-in">{percent(count, total)}%</span>
-        </span>
+        <span key={label} className="ring-tip-text swap-in"><TipText label={label} count={count} total={total} /></span>
       </span>
+      {leaving && (
+        <span key={leaving.label} className="ring-tip-text swap-out" onAnimationEnd={() => setLeaving(null)}>
+          <TipText {...leaving} total={total} />
+        </span>
+      )}
     </div>
   );
 }

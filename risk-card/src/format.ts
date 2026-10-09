@@ -20,5 +20,7 @@ export function shareText(n: number, d: number): string | null {
   return `${Math.round(r * 100)}%`;
 }
 
-/** The tooltip's percent: two decimals at most (11.65%, 50%), as ECharts prints a pie's. */
+/** The ring tooltip's percent: two decimals at most (11.65%, 50%). ECharts' pie percent is largest
+ *  remainder (its five shares add up to exactly 100), so the last digit can differ: Low reads 22.7%
+ *  on the pie and 22.69% on the ring. Both are as the originals print them. */
 export const percent = (n: number, total: number) => (total > 0 ? Number(((n / total) * 100).toFixed(2)) : 0);

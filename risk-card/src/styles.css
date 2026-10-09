@@ -1,6 +1,11 @@
+@font-face { font-family: 'Geist'; src: url('/fonts/Geist-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url('/fonts/Geist-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url('/fonts/Geist-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url('/fonts/Geist-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
 :root {
   color-scheme: dark;
-  --background: oklch(0.135 0.005 265);   /* #07080a  page */
+  --background: oklch(0.135 0.005 265);   /* #07080a  the app's frame; the pie's slice borders */
   --card: oklch(0.18 0.008 265);          /* #101215  card and tooltip surface */
   --border: oklch(0.26 0.012 265);        /* #21242a */
   --foreground: oklch(0.97 0.003 265);    /* #f4f5f7 */
@@ -13,23 +18,33 @@
   --sev-info: oklch(0.615 0.1046 200);     /* #00979d  the old Low's blue-teal (new) */
 
   --ease-morph: cubic-bezier(0.25, 1, 0.5, 1);
+  /* The tooltip's level switch, softened for the video (live: 150ms on --ease-morph). */
+  --tip-switch: 500ms;
+  --tip-fade-out: 300ms;
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);   /* Tailwind's ease-out, not the CSS keyword */
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  background: var(--background);
+  /* The card sits on the app's page sheet, which is the card's own colour in dark mode, so the card
+     reads by its border, not as a raised tile. */
+  background: var(--card);
   color: var(--foreground);
   font-family: Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── Card (the platform's card) ─────────────────────────────────────── */
 .card {
-  width: 380px;
+  width: 380.65625px;   /* a third of the live 1174px grid, less its two 16px gaps */
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -84,8 +99,8 @@ html, body {
 /* Both the level groups and the single spokes scale about the ring's centre: the SVG's view box,
    not their own boxes. The CSS `scale` property, not a transform attribute. */
 .ring g, .ring line { transform-origin: center; transform-box: view-box; }
-.ring g { transition: scale 150ms ease-out; }      /* a legend row growing its level */
-.ring line { transition: scale 100ms ease-out; }   /* the Dock */
+.ring g { transition: scale 150ms var(--ease-out); }      /* a legend row growing its level */
+.ring line { transition: scale 100ms var(--ease-out); }   /* the Dock */
 .ring .center {
   position: absolute; inset: 0; pointer-events: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -109,13 +124,20 @@ html, body {
   line-height: 18px;
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
   translate: -50% -100%;
-  transition: width 150ms var(--ease-morph);
+  transform-origin: 50% 100%;
+  transition: width var(--tip-switch) var(--ease-soft);
+  animation: tip-in 300ms var(--ease-morph) backwards;
 }
 .ring-tip-inner { display: inline-flex; width: max-content; flex-direction: column; }
+.ring-tip-text { display: flex; width: max-content; flex-direction: column; }
 .ring-tip b { font-weight: 600; }
-.swap-in { display: inline-block; animation: label-in 150ms var(--ease-morph) backwards; }
-.ring-tip-inner > .swap-in:first-child { display: block; }
-@keyframes label-in { from { opacity: 0; filter: blur(2px); } }
+/* Softened for the video: the new level's words blur in while the old ones blur out on top, at the
+   content box's corner, so they don't push the width. */
+.swap-in { animation: tip-text-in var(--tip-switch) var(--ease-soft) backwards; }
+.swap-out { position: absolute; top: 6px; left: 10px; animation: tip-text-out var(--tip-fade-out) var(--ease-soft) forwards; }
+@keyframes tip-in { from { opacity: 0; scale: 0.96; filter: blur(2px); } }
+@keyframes tip-text-in { from { opacity: 0; filter: blur(4px); translate: 0 3px; } }
+@keyframes tip-text-out { to { opacity: 0; filter: blur(4px); translate: 0 -3px; } }
 
 /* ── Before: the donut ──────────────────────────────────────────────── */
 .pie-content { gap: 16px; }
@@ -129,7 +151,7 @@ html, body {
 .pie .total-sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
 
 /* ── Stage for the screenshot or recording ──────────────────────────── */
-.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 48px; }
+.stage { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; gap: 48px; padding: 96px 48px; }
 .stage figure { margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .stage figcaption { font-size: 13px; font-weight: 500; color: var(--muted-foreground); letter-spacing: 0.02em; text-transform: uppercase; }
 

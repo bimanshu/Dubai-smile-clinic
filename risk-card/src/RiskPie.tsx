@@ -3,16 +3,14 @@ import * as echarts from 'echarts';
 import { HEX, type Item } from './data';
 import { formatCount, shareText } from './format';
 
+/** `levels`: the levels with any (a level with none isn't in the chart: minAngle would still draw
+ *  it as a 4° sliver). */
 function Donut({ levels }: { levels: Item[] }) {
   const el = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!el.current) return;
     const chart = echarts.init(el.current, null, { renderer: 'canvas' });
     chart.setOption({
-      animation: true,
-      animationDuration: 600,
-      animationEasing: 'cubicOut',
-      animationDurationUpdate: 300,
       tooltip: {
         trigger: 'item',
         backgroundColor: HEX.card,
@@ -29,6 +27,11 @@ function Donut({ levels }: { levels: Item[] }) {
       series: [
         {
           type: 'pie',
+          // The intro: here, on the series, where the pie reads them.
+          animation: true,
+          animationDuration: 600,
+          animationEasing: 'cubicOut',
+          animationDurationUpdate: 300,
           cursor: 'default',
           radius: ['52%', '75%'],
           center: ['50%', '50%'],
@@ -43,7 +46,9 @@ function Donut({ levels }: { levels: Item[] }) {
         },
       ],
     });
-    const ro = new ResizeObserver(() => chart.resize());
+    // Skip the observer's first report (it fires at once, and a resize would end the intro).
+    let first = true;
+    const ro = new ResizeObserver(() => { if (first) { first = false; return; } chart.resize(); });
     ro.observe(el.current);
     return () => { ro.disconnect(); chart.dispose(); };
   }, [levels]);
@@ -59,7 +64,7 @@ export function RiskPieCard({ levels, total }: { levels: Item[]; total: number }
       </div>
       <div className="card-content pie-content">
         <div className="pie">
-          <Donut levels={levels} />
+          <Donut levels={levels.filter((l) => l.count > 0)} />
           {/* The total in the hole; the legend below says the same level by level. */}
           <div aria-hidden="true" className="center">
             <span className="total">{formatCount(total)}</span>
