@@ -1,0 +1,139 @@
+:root {
+  color-scheme: dark;
+  --background: oklch(0.135 0.005 265);   /* #07080a  page */
+  --card: oklch(0.18 0.008 265);          /* #101215  card and tooltip surface */
+  --border: oklch(0.26 0.012 265);        /* #21242a */
+  --foreground: oklch(0.97 0.003 265);    /* #f4f5f7 */
+  --muted-foreground: oklch(0.8 0.008 265); /* #bbbec3 */
+
+  --sev-critical: oklch(0.59 0.2405 27);   /* #ea001a */
+  --sev-high: oklch(0.64 0.1693 50);       /* #da6600 */
+  --sev-medium: oklch(0.86 0.1539 85);     /* #ffc845 */
+  --sev-low: oklch(0.61 0.1681 150);       /* #009e48  green (new) */
+  --sev-info: oklch(0.615 0.1046 200);     /* #00979d  the old Low's blue-teal (new) */
+
+  --ease-morph: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Card (the platform's card) ─────────────────────────────────────── */
+.card {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+.card-header {
+  display: grid;
+  grid-auto-rows: min-content;
+  align-items: start;
+  gap: 8px;
+  padding: 0 24px;
+}
+.card-title { font-size: 16px; line-height: 1; font-weight: 600; color: var(--foreground); }
+.card-desc { font-size: 14px; line-height: 20px; color: var(--muted-foreground); text-wrap: pretty; }
+.card-content { padding: 0 24px; display: flex; flex: 1; flex-direction: column; }
+
+/* ── Legend (both cards) ────────────────────────────────────────────── */
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.legend-ring { column-gap: 20px; }   /* after */
+.legend-pie { column-gap: 16px; }    /* before */
+.legend li { display: inline-flex; align-items: baseline; gap: 6px; }
+.mark { display: inline-block; width: 10px; height: 10px; flex-shrink: 0; border-radius: 3px; align-self: center; }
+.legend .count { font-weight: 600; }
+.legend .share { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+.legend .none { color: var(--muted-foreground); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ── After: the spoke ring ──────────────────────────────────────────── */
+.ring-box { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+.ring { position: relative; width: 192px; height: 192px; flex-shrink: 0; }
+/* The pointer area reaches past the box to the grown spokes' ends, 9% of the box each side. */
+.ring-hit { position: absolute; inset: -9%; }
+.ring svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; }
+/* Both the level groups and the single spokes scale about the ring's centre: the SVG's view box,
+   not their own boxes. The CSS `scale` property, not a transform attribute. */
+.ring g, .ring line { transform-origin: center; transform-box: view-box; }
+.ring g { transition: scale 150ms ease-out; }      /* a legend row growing its level */
+.ring line { transition: scale 100ms ease-out; }   /* the Dock */
+.ring .center {
+  position: absolute; inset: 0; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ring .total { font-size: 30px; line-height: 36px; font-weight: 600; letter-spacing: -0.75px; }
+.ring .total-sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+
+/* The tooltip: the chart tooltip's box, centred above the pointer. Its width eases to its words. */
+.ring-tip {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
+  width: var(--morph-w);
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 18px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+  translate: -50% -100%;
+  transition: width 150ms var(--ease-morph);
+}
+.ring-tip-inner { display: inline-flex; width: max-content; flex-direction: column; }
+.ring-tip b { font-weight: 600; }
+.swap-in { display: inline-block; animation: label-in 150ms var(--ease-morph) backwards; }
+.ring-tip-inner > .swap-in:first-child { display: block; }
+@keyframes label-in { from { opacity: 0; filter: blur(2px); } }
+
+/* ── Before: the donut ──────────────────────────────────────────────── */
+.pie-content { gap: 16px; }
+.pie { position: relative; height: 200px; }
+.pie-canvas { width: 100%; height: 200px; }
+.pie .center {
+  position: absolute; inset: 0; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.pie .total { font-size: 24px; line-height: 28px; font-weight: 600; }
+.pie .total-sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
+
+/* ── Stage for the screenshot or recording ──────────────────────────── */
+.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 48px; }
+.stage figure { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.stage figcaption { font-size: 13px; font-weight: 500; color: var(--muted-foreground); letter-spacing: 0.02em; text-transform: uppercase; }
+
+/* Reduced motion: no Dock (RiskRing checks this too), no easing, no fades. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
