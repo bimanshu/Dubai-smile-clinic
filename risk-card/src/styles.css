@@ -11,11 +11,12 @@
   --foreground: oklch(0.97 0.003 265);    /* #f4f5f7 */
   --muted-foreground: oklch(0.8 0.008 265); /* #bbbec3 */
 
-  --sev-critical: oklch(0.59 0.2405 27);   /* #ea001a */
-  --sev-high: oklch(0.64 0.1693 50);       /* #da6600 */
-  --sev-medium: oklch(0.86 0.1539 85);     /* #ffc845 */
-  --sev-low: oklch(0.61 0.1681 150);       /* #009e48  green (new) */
-  --sev-info: oklch(0.615 0.1046 200);     /* #00979d  the old Low's blue-teal (new) */
+  /* Brightened for the Dribbble shot: lighter, at the most chroma sRGB holds at each lightness. */
+  --sev-critical: oklch(0.64 0.2445 27);   /* #ff262b */
+  --sev-high: oklch(0.71 0.1867 50);       /* #f97604 */
+  --sev-medium: oklch(0.875 0.149 88);     /* #ffcf52 */
+  --sev-low: oklch(0.72 0.1972 150);       /* #06c55c  green (new) */
+  --sev-info: oklch(0.72 0.1214 200);     /* #09bbc2  the old Low's blue-teal (new) */
 
   --ease-morph: cubic-bezier(0.25, 1, 0.5, 1);
   /* The tooltip's level switch, softened for the video (live: 150ms on --ease-morph). */
@@ -151,9 +152,7 @@ html, body {
 .pie .total-sub { font-size: 12px; line-height: 16px; color: var(--muted-foreground); }
 
 /* ── Stage for the screenshot or recording ──────────────────────────── */
-.stage { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; gap: 48px; padding: 96px 48px; }
-.stage figure { margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.stage figcaption { font-size: 13px; font-weight: 500; color: var(--muted-foreground); letter-spacing: 0.02em; text-transform: uppercase; }
+.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 96px 48px; }
 
 /* Reduced motion: no Dock (RiskRing checks this too), no easing, no fades. */
 @media (prefers-reduced-motion: reduce) {

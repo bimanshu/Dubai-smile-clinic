@@ -12,11 +12,11 @@ export interface Item {
 
 /** Most severe first: the ring runs clockwise from the top in this order, and so does the pie. */
 export const LEVELS: Item[] = [
-  { level: 'critical', label: 'Critical', count: 96, color: 'var(--sev-critical)', hex: '#ea001a' },
-  { level: 'high', label: 'High', count: 168, color: 'var(--sev-high)', hex: '#da6600' },
-  { level: 'medium', label: 'Medium', count: 231, color: 'var(--sev-medium)', hex: '#ffc845' },
-  { level: 'low', label: 'Low', count: 187, color: 'var(--sev-low)', hex: '#009e48' },
-  { level: 'info', label: 'Informational', count: 142, color: 'var(--sev-info)', hex: '#00979d' },
+  { level: 'critical', label: 'Critical', count: 96, color: 'var(--sev-critical)', hex: '#ff262b' },
+  { level: 'high', label: 'High', count: 168, color: 'var(--sev-high)', hex: '#f97604' },
+  { level: 'medium', label: 'Medium', count: 231, color: 'var(--sev-medium)', hex: '#ffcf52' },
+  { level: 'low', label: 'Low', count: 187, color: 'var(--sev-low)', hex: '#06c55c' },
+  { level: 'info', label: 'Informational', count: 142, color: 'var(--sev-info)', hex: '#09bbc2' },
 ];
 
 export const TOTAL = LEVELS.reduce((a, l) => a + l.count, 0); // 824
